@@ -77,8 +77,6 @@ function setLens(i, how = 'click') {
     if (on && how !== 'init') c.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: 'smooth' });
   });
   if (how === 'key' || how === 'wheel' || how === 'remote') toast(lens.name, lens.accent);
-  refreshCloth();
-  if (how !== 'remote') lensChannel?.postMessage({ type: 'lens', lens: i });
 }
 
 function batikOptions(geo) {
@@ -589,127 +587,6 @@ function flash() {
   el.classList.add('show');
 }
 
-// ---------- The kain window ----------
-// The active batik as a hanging cloth (cloth.js, Three.js), in a little window you can pop up,
-// hide and drag about. Where you leave it is remembered on this device.
-
-const kain = { view: null, loading: false, open: false, shown: -1, timer: 0 };
-
-function remember(key, value) {
-  try { localStorage.setItem(`aksara.${key}`, JSON.stringify(value)); } catch { /* private mode */ }
-}
-function recall(key, fallback) {
-  try { return JSON.parse(localStorage.getItem(`aksara.${key}`)) ?? fallback; } catch { return fallback; }
-}
-
-async function setCloth(open) {
-  kain.open = open;
-  $('cloth').dataset.open = open;
-  $('clothShow').checked = open;
-  if (!open) { kain.view?.stop(); return; }
-  if (!kain.view && !kain.loading) {
-    kain.loading = true;
-    try {
-      const { Cloth } = await import('./cloth.js?v=2');
-      kain.view = new Cloth($('clothCanvas'));
-    } catch (err) {
-      setStatus(`The kain window couldn't start: ${err.message}`, true);
-    } finally {
-      kain.loading = false;
-    }
-  }
-  if (!kain.view || !kain.open) return;
-  kain.view.resize();
-  kain.view.start();
-  kain.shown = -1;
-  refreshCloth();
-}
-
-// Weave the active batik onto the cloth. Building the swatch takes a moment, so it waits until
-// the lens has settled (a quick run of N, N, N only weaves the last one).
-function refreshCloth() {
-  const lens = lensAt(portal.lens);
-  $('clothName').textContent = lens.name;
-  $('clothPlace').textContent = lens.place;
-  if (!kain.open || !kain.view || kain.shown === portal.lens) return;
-  clearTimeout(kain.timer);
-  kain.timer = setTimeout(() => {
-    kain.shown = portal.lens;
-    kain.view.setTexture(Batik.swatch(lensAt(portal.lens).id, 1024, 1280));
-  }, 120);
-}
-
-$('clothShow').addEventListener('change', (e) => setCloth(e.target.checked));
-$('clothWindowOpen').addEventListener('click', () => openKainScreen('window'));
-$('clothTabOpen').addEventListener('click', () => openKainScreen('tab'));
-$('clothWindow').addEventListener('click', () => openKainScreen('window'));
-$('clothTab').addEventListener('click', () => openKainScreen('tab'));
-
-// The kain as its own screen (kain.html), in a new tab or a window you can move to another display.
-// It follows the active batik over this channel, and choosing a batik there switches this app.
-const lensChannel = 'BroadcastChannel' in window ? new BroadcastChannel('batik-lens') : null;
-if (lensChannel) {
-  lensChannel.onmessage = ({ data }) => {
-    if (data?.type === 'hello') lensChannel.postMessage({ type: 'lens', lens: portal.lens });
-    else if (data?.type === 'lens' && data.lens !== portal.lens) setLens(data.lens, 'remote');
-  };
-  window.addEventListener('pagehide', () => lensChannel.postMessage({ type: 'bye' }));
-}
-
-function openKainScreen(as) {
-  const win = as === 'window'
-    ? window.open('kain.html', 'batik-lens-kain', 'popup,width=560,height=780')
-    : window.open('kain.html', '_blank');
-  if (!win) setStatus('The browser blocked the new window. Allow pop-ups for this page, then try again.', true);
-  else win.focus();
-}
-$('clothClose').addEventListener('click', () => setCloth(false));
-
-// Ripples: tap, or drag across the cloth.
-{
-  const c = $('clothCanvas');
-  let down = false, last = 0;
-  c.addEventListener('pointerdown', (e) => { down = true; c.setPointerCapture(e.pointerId); kain.view?.poke(e.clientX, e.clientY, 1); });
-  c.addEventListener('pointermove', (e) => {
-    if (!down || performance.now() - last < 110) return;
-    last = performance.now();
-    kain.view?.poke(e.clientX, e.clientY, 0.6);
-  });
-  c.addEventListener('pointerup', () => { down = false; });
-}
-
-// Drag the window by its title bar; it stays on screen.
-{
-  const panel = $('cloth'), bar = $('clothBar');
-  let start = null;
-  const place = (x, y) => {
-    const r = panel.getBoundingClientRect();
-    x = Math.min(Math.max(8, x), window.innerWidth - r.width - 8);
-    y = Math.min(Math.max(8, y), window.innerHeight - r.height - 8);
-    Object.assign(panel.style, { left: `${x}px`, top: `${y}px`, right: 'auto', bottom: 'auto' });
-    return [x, y];
-  };
-  bar.addEventListener('pointerdown', (e) => {
-    if (e.target.closest('button')) return;
-    const r = panel.getBoundingClientRect();
-    start = { dx: e.clientX - r.left, dy: e.clientY - r.top };
-    bar.setPointerCapture(e.pointerId);
-  });
-  bar.addEventListener('pointermove', (e) => { if (start) place(e.clientX - start.dx, e.clientY - start.dy); });
-  bar.addEventListener('pointerup', () => {
-    if (!start) return;
-    start = null;
-    const r = panel.getBoundingClientRect();
-    remember('kainAt', [r.left, r.top]);
-  });
-  const at = recall('kainAt', null);
-  if (Array.isArray(at)) requestAnimationFrame(() => place(at[0], at[1]));
-  window.addEventListener('resize', () => {
-    if (panel.style.left) { const r = panel.getBoundingClientRect(); place(r.left, r.top); }
-    kain.view?.resize();
-  });
-}
-
 // ---------- Mouse & touch ----------
 
 function canvasPoint(e) {
@@ -786,8 +663,6 @@ document.addEventListener('keydown', (e) => {
   else if (k === 'f') setMode(portal.mode === 'full' ? 'portal' : 'full');
   else if (k === 's') { flash(); snapshot(); }
   else if (k === 'h') ui.portalHands.checked = !ui.portalHands.checked;
-  else if (k === 'k' && e.shiftKey) openKainScreen('window');
-  else if (k === 'k') setCloth(!kain.open);
   else if (k === 'm') setDrawer($('drawer').dataset.open !== 'true');
   else if (k === 'escape') { if ($('drawer').dataset.open === 'true') setDrawer(false); else portal.pinned = null; }
   else if (k === ' ') togglePause();
@@ -857,6 +732,5 @@ syncOutputs();
 setSource('demo', demo, demo.width, demo.height); // shown while the camera starts
 setLens(0, 'init');
 updateKeepControls();
-setCloth(false); // the page opens on the picture alone; the kain pops up on request
 state.raf = requestAnimationFrame(loop);
 startWebcam();

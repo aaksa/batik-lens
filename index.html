@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <!-- UI fonts, Aksara Jawa for the title, and Naskh Arabic for Besurek's calligraphy. -->
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600&family=JetBrains+Mono:wght@400;600&family=Noto+Sans+Javanese:wght@400;700&family=Noto+Naskh+Arabic:wght@400;700&display=swap">
-  <link rel="stylesheet" href="style.css?v=12">
+  <link rel="stylesheet" href="style.css?v=13">
 </head>
 <body class="app">
   <!-- The screen: just the picture. Everything else lives in the settings drawer. -->
@@ -39,7 +39,7 @@
     <ul class="gestures" aria-label="Gestures">
       <li><b>👉 👍</b> Left index finger + right thumb are the corners</li>
       <li><b>🤏</b> Right hand: pinch thumb to index (or click) to keep it here, next batik</li>
-      <li><b>⌨</b> N / P batik · Enter keep · Z undo · X clear · K kain · Shift+K kain window · M settings · S save</li>
+      <li><b>⌨</b> N / P batik · Enter keep · Z undo · X clear · M settings · S save</li>
     </ul>
 
     <div class="rail">
@@ -89,16 +89,6 @@
         <small class="hint">The picture is built from the motif itself: bright areas get bigger pieces in lighter dye, shadows get small pieces in the deepest dye.</small>
       </fieldset>
 
-      <fieldset>
-        <legend>Kain</legend>
-        <label class="check"><input type="checkbox" id="clothShow" aria-controls="cloth"> Show the kain window</label>
-        <div class="seg">
-          <button type="button" id="clothWindowOpen">New window</button>
-          <button type="button" id="clothTabOpen">New tab</button>
-        </div>
-        <small class="hint">The active batik as a hanging cloth. Open it in its own window to put it on another screen; it follows whichever batik you choose here.</small>
-      </fieldset>
-
       <div class="actions">
         <button type="button" id="pause">Pause</button>
         <button type="button" id="png">Save image</button>
@@ -107,22 +97,9 @@
     </div>
   </aside>
 
-  <section class="cloth" id="cloth" data-open="false" aria-label="The batik as cloth">
-    <header class="cloth-bar" id="clothBar" title="Drag to move">
-      <span class="cloth-title"><b id="clothName"></b> <small id="clothPlace"></small></span>
-      <span class="cloth-buttons">
-        <button type="button" id="clothWindow" title="Open in a new window (Shift+K)" aria-label="Open the kain in a new window">⧉</button>
-        <button type="button" id="clothTab" title="Open in a new tab" aria-label="Open the kain in a new tab">↗</button>
-        <button type="button" id="clothClose" title="Hide (K)" aria-label="Hide the cloth">✕</button>
-      </span>
-    </header>
-    <canvas id="clothCanvas" aria-label="The current batik on a hanging cloth. Tap to ripple it."></canvas>
-    <p class="cloth-tip">Tap or drag on the cloth to ripple it</p>
-  </section>
-
   <script src="lenses.js?v=1"></script>
-  <script src="batik.js?v=14"></script>
+  <script src="batik.js?v=15"></script>
   <script src="app.js?v=10"></script>
-  <script src="portal.js?v=17"></script>
+  <script src="portal.js?v=18"></script>
 </body>
 </html>

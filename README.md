@@ -17,8 +17,6 @@ The five batik, from five provinces:
 | Sasirangan | South Kalimantan |
 | Besurek | Bengkulu |
 
-A kain window (or its own screen, `kain.html`) shows the active batik as a hanging cloth.
-
 ## Run it
 
 It's a static site with no build step. Serve the folder and open it:
@@ -33,7 +31,6 @@ Then visit http://localhost:5173. The camera needs `localhost` or HTTPS.
 
 - `portal.js`: the hand portal, gestures, kept regions and the main loop
 - `batik.js`: the five batik, drawn procedurally with Canvas 2D
-- `cloth.js` / `kain.html`: the hanging cloth, a Three.js shader
 - `hands.js` / `face.js`: MediaPipe hand and face tracking
 
 Third-party files are listed in [VENDOR-NOTES.md](VENDOR-NOTES.md). All processing happens on your

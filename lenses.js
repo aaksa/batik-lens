@@ -1,4 +1,4 @@
-// The five batik, shared by the main app (portal.js) and the kain screen (kain.js).
+// The five batik used by the main app.
 
 const LENSES = [
   { id: 'parang', name: 'Parang', place: 'Yogyakarta', group: 'batik', shelf: 'Batik', accent: '#b07a43',

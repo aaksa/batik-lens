@@ -977,51 +977,6 @@ const Batik = (() => {
     g.restore();
   }
 
-  // A clean piece of the cloth itself, for the kain window: every piece at full size in the
-  // lighter dyes, on the woven ground, with crackle and a pinggiran border along both long edges
-  // like a kain panjang.
-  function swatch(id, w, h) {
-    const c = canvas(w, h), g = c.getContext('2d'), ramp = KIT[id].ramp;
-    const o = {
-      mirror: false, invert: false, size: 1.15, balance: 0.5, crackle: 0.45,
-      focus: { x: w / 2, y: h / 2 }, origin: { x: w / 2, y: h / 2 }, since: 1e9, clock: 0, face: null,
-    };
-    o.k = (w / 720) * o.size;
-    o.reach = 1;
-    g.fillStyle = ramp[0];
-    g.fillRect(0, 0, w, h);
-    const t = groundTile(id);
-    g.save();
-    g.globalAlpha = 0.32;
-    g.fillStyle = pattern(g, t.tile, w, o, t.angle);
-    g.fillRect(0, 0, w, h);
-    g.restore();
-    g.save();
-    build[id](g, w, h, o, () => 0.82, (v) => v);
-    g.restore();
-    g.setTransform(1, 0, 0, 1, 0, 0);
-    crackleOver(g, w, h, o, o.crackle * 0.6);
-
-    // pinggiran: a dyed band with wax lines and a row of cecek, top and bottom
-    const bw = h * 0.045;
-    for (const y of [0, h - bw]) {
-      g.fillStyle = ramp[1];
-      g.fillRect(0, y, w, bw);
-      g.fillStyle = WAX;
-      g.fillRect(0, y + bw * 0.18, w, Math.max(1, bw * 0.07));
-      g.fillRect(0, y + bw * 0.75, w, Math.max(1, bw * 0.07));
-      for (let x = bw * 0.4; x < w; x += bw * 0.55) {
-        g.beginPath(); g.arc(x, y + bw * 0.47, bw * 0.09, 0, Math.PI * 2); g.fill();
-      }
-    }
-    g.save();
-    g.globalCompositeOperation = 'soft-light';
-    g.fillStyle = 'rgba(160,110,60,0.22)';
-    g.fillRect(0, 0, w, h);
-    g.restore();
-    return c;
-  }
-
   // Rebuild the Besurek sprites once the Arabic font has arrived, so its calligraphy isn't drawn
   // in a fallback font.
   document.fonts?.load(`64px ${ARABIC}`, 'ســـطعـــق').then(() => {
@@ -1032,5 +987,5 @@ const Batik = (() => {
   const lenses = {};
   for (const id of Object.keys(KIT)) lenses[id] = (g, src, w, h, o) => render(id, g, src, w, h, o);
 
-  return { lenses, swatch };
+  return { lenses };
 })();
