@@ -234,14 +234,6 @@ button.recording { background: #c8412b; border-color: #c8412b; color: #fff; }
 #clothCanvas { display: block; width: 100%; height: 360px; cursor: pointer; touch-action: none; }
 .cloth-tip { margin: 0; padding: 0 12px 10px; font-size: 12px; color: var(--muted); text-align: center; }
 
-.cloth-fab {
-  position: fixed; right: 20px; bottom: 20px; z-index: 49;
-  padding: 10px 16px; border-radius: 999px;
-  background: var(--emas); border-color: var(--emas); color: #1a120d; font-weight: 600;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
-  transition: transform .2s, opacity .2s;
-}
-.cloth-fab[hidden] { display: none; }
 
 @media (max-width: 860px) {
   .cloth { width: 210px; right: 12px; bottom: 12px; }

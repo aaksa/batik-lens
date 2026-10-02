@@ -605,7 +605,7 @@ function recall(key, fallback) {
 async function setCloth(open) {
   kain.open = open;
   $('cloth').dataset.open = open;
-  $('clothToggle').hidden = open;
+  $('clothShow').checked = open;
   if (!open) { kain.view?.stop(); return; }
   if (!kain.view && !kain.loading) {
     kain.loading = true;
@@ -639,7 +639,9 @@ function refreshCloth() {
   }, 120);
 }
 
-$('clothToggle').addEventListener('click', () => setCloth(true));
+$('clothShow').addEventListener('change', (e) => setCloth(e.target.checked));
+$('clothWindowOpen').addEventListener('click', () => openKainScreen('window'));
+$('clothTabOpen').addEventListener('click', () => openKainScreen('tab'));
 $('clothWindow').addEventListener('click', () => openKainScreen('window'));
 $('clothTab').addEventListener('click', () => openKainScreen('tab'));
 
