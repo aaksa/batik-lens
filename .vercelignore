@@ -1,0 +1,6 @@
+.claude
+batik-portal
+.git
+.DS_Store
+.env*
+.vercel

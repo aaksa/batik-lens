@@ -3,3 +3,5 @@
 .DS_Store
 # a separate copy of the app that lives alongside this one, not part of it
 batik-portal/
+.vercel
+.env*
