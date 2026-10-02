@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Batik Lens</title>
+  <link rel="icon" href="data:,">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <!-- UI fonts, Aksara Jawa for the title, and Naskh Arabic for Besurek's calligraphy. -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600&family=JetBrains+Mono:wght@400;600&family=Noto+Sans+Javanese:wght@400;700&family=Noto+Naskh+Arabic:wght@400;700&display=swap">
+  <link rel="stylesheet" href="style.css?v=11">
+</head>
+<body class="app">
+  <!-- The screen: just the picture. Everything else lives in the settings drawer. -->
+  <main class="screen" aria-label="Batik Lens">
+    <div class="stage-frame">
+      <canvas id="out" aria-label="Camera picture with the batik portal"></canvas>
+      <div class="toast" id="toast" aria-live="polite"></div>
+      <div class="stage-hint" id="hint"></div>
+      <p id="status" class="status" role="status"></p>
+      <div class="flash" id="flash"></div>
+    </div>
+  </main>
+
+  <button type="button" class="menu-fab" id="menuToggle" aria-controls="drawer" aria-expanded="false" title="Settings (M)">
+    <span aria-hidden="true">☰</span> Settings
+  </button>
+
+  <aside class="drawer" id="drawer" data-open="false" aria-label="Settings">
+    <header class="drawer-head">
+      <h1><span class="title-aksara" lang="jv">ꦧꦛꦶꦏ꧀</span> <span class="title-latin">Batik Lens</span></h1>
+      <button type="button" id="menuClose" title="Close (M or Esc)" aria-label="Close the settings">✕</button>
+    </header>
+    <p class="tagline">Frame a portal with your hands. Everything inside it becomes batik.</p>
+
+    <div class="shelf" id="shelf" role="listbox" aria-label="Batik"></div>
+
+    <ul class="gestures" aria-label="Gestures">
+      <li><b>👉 👍</b> Left index finger + right thumb are the corners</li>
+      <li><b>🤏</b> Right hand: pinch thumb to index (or click) to keep it here, next batik</li>
+      <li><b>⌨</b> N / P batik · Enter keep · Z undo · X clear · K kain · Shift+K kain window · M settings · S save</li>
+    </ul>
+
+    <div class="rail">
+      <fieldset>
+        <legend>Source</legend>
+        <div class="seg">
+          <button type="button" id="srcDemo" aria-pressed="true">Demo</button>
+          <button type="button" id="srcCam" aria-pressed="false">Webcam</button>
+          <label class="btn-like" for="srcFile">Upload video or image</label>
+          <input type="file" id="srcFile" accept="video/*,image/*" hidden>
+        </div>
+        <label class="check"><input type="checkbox" id="mirror"> Mirror</label>
+      </fieldset>
+
+      <fieldset>
+        <legend>Portal</legend>
+        <div class="seg" role="group" aria-label="Where the batik shows">
+          <button type="button" id="modePortal" aria-pressed="true">In a portal</button>
+          <button type="button" id="modeFull" aria-pressed="false">Whole frame</button>
+        </div>
+        <label class="check"><input type="checkbox" id="portalHands" checked> Show hands</label>
+        <div class="kept">
+          <span id="keepCount">None kept yet</span>
+          <button type="button" id="keepUndo">Undo last</button>
+          <button type="button" id="keepClear">Clear all</button>
+        </div>
+        <small class="hint">Each time you keep the portal, that region stays as batik and the portal moves on to the next one, so you can build up a collage.</small>
+      </fieldset>
+
+      <fieldset>
+        <legend>Batik</legend>
+        <div class="about">
+          <strong id="batikName"></strong>
+          <p id="batikAbout"></p>
+        </div>
+        <label class="check"><input type="checkbox" id="bFace" checked> Draw my face in the motif</label>
+        <label class="row">Motif size <output for="bSize"></output>
+          <input type="range" id="bSize" min="0.4" max="2.5" step="0.05" value="1">
+        </label>
+        <label class="row">Brightness balance <output for="bBalance"></output>
+          <input type="range" id="bBalance" min="0.2" max="0.8" step="0.01" value="0.5">
+        </label>
+        <label class="row">Wax crackle (remukan) <output for="bCrackle"></output>
+          <input type="range" id="bCrackle" min="0" max="1" step="0.05" value="0.5">
+        </label>
+        <label class="check"><input type="checkbox" id="invert"> Invert light and dark</label>
+        <small class="hint">The picture is built from the motif itself: bright areas get bigger pieces in lighter dye, shadows get small pieces in the deepest dye.</small>
+      </fieldset>
+
+      <div class="actions">
+        <button type="button" id="pause">Pause</button>
+        <button type="button" id="png">Save image</button>
+        <button type="button" id="rec" class="primary">Record video</button>
+      </div>
+    </div>
+  </aside>
+
+  <section class="cloth" id="cloth" data-open="false" aria-label="The batik as cloth">
+    <header class="cloth-bar" id="clothBar" title="Drag to move">
+      <span class="cloth-title"><b id="clothName"></b> <small id="clothPlace"></small></span>
+      <span class="cloth-buttons">
+        <button type="button" id="clothWindow" title="Open in a new window (Shift+K)" aria-label="Open the kain in a new window">⧉</button>
+        <button type="button" id="clothTab" title="Open in a new tab" aria-label="Open the kain in a new tab">↗</button>
+        <button type="button" id="clothClose" title="Hide (K)" aria-label="Hide the cloth">✕</button>
+      </span>
+    </header>
+    <canvas id="clothCanvas" aria-label="The current batik on a hanging cloth. Tap to ripple it."></canvas>
+    <p class="cloth-tip">Tap or drag on the cloth to ripple it</p>
+  </section>
+  <button type="button" class="cloth-fab" id="clothToggle" aria-controls="cloth">Show the kain</button>
+
+  <script src="lenses.js?v=1"></script>
+  <script src="batik.js?v=14"></script>
+  <script src="app.js?v=10"></script>
+  <script src="portal.js?v=16"></script>
+</body>
+</html>
